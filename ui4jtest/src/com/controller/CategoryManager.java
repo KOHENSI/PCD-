@@ -11,10 +11,5 @@ public class CategoryManager {
 		ResultSet res;
 		
 		res = conn.ReadRequest("select category from allproducts where category id = 0");
-		
-		while()
-		
-		
-		conn.arret();
-	}
+}
 }

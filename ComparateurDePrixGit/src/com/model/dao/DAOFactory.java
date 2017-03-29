@@ -72,8 +72,8 @@ public class DAOFactory {
     }/* Méthode chargée de fournir une connexion à la base de données */
     /* package */
 
-    Connection getConnection() throws SQLException {
-        return DriverManager.getConnection( url, username, password );
+    com.mysql.jdbc.Connection getConnection() throws SQLException {
+        return (com.mysql.jdbc.Connection) DriverManager.getConnection( url, username, password );
     }
 
     /*
@@ -83,4 +83,7 @@ public class DAOFactory {
     public MemberDao getMemberDao() {
         return new MemberDaoImpl( this );
     }
+    public ProductDao getProductDao() {
+        return new ProductDaoImpl(this);
+}
 }
