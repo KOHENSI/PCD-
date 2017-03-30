@@ -8,44 +8,46 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.model.dao.CategoryDao;
 import com.model.dao.DAOFactory;
 import com.model.dao.ProductDao;
 
 /**
- * Servlet implementation class product
+ * Servlet implementation class category
  */
-@WebServlet("/product")
-public class product extends HttpServlet {
+@WebServlet("/category")
+public class category extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
 	private ProductDao productDao;
-	private CategoryDao categoryDao;
 
     public void init() throws ServletException {
         DAOFactory daoFactory = DAOFactory.getInstance();
         this.productDao = daoFactory.getProductDao();
-        this.categoryDao = daoFactory.getCategoryDao();
+    }
+    public category() {
+        super();
+        // TODO Auto-generated constructor stub
     }
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	    String id = request.getParameter("id");
-		request.setAttribute("product", productDao.getProductById(id));
-		request.setAttribute("categories",categoryDao.lister() );
-		this.getServletContext().getRequestDispatcher("/WEB-INF/product.jsp").forward(request, response);
+		// TODO Auto-generated method stub
+		String id = request.getParameter("id");
+		request.setAttribute("products", productDao.listerParCategorie(id));
+		this.getServletContext().getRequestDispatcher("/WEB-INF/category.jsp").forward(request, response);
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		this.getServletContext().getRequestDispatcher("/WEB-INF/product.jsp").forward(request, response);
+		// TODO Auto-generated method stub
+		this.getServletContext().getRequestDispatcher("/WEB-INF/category.jsp").forward(request, response);
 	}
 
 }
