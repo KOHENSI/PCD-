@@ -117,7 +117,7 @@
                     <ul class="dropdown-menu" role="menu" >
                     	<c:forEach var="category" items="${categories }">
                     	<c:if test="${category.pid  eq 0}">
-                        <li class="menu-header"><a  href="category.html">${category.name}</a></li>
+                        <li class="menu-header"><a  href="category?id=${category.id }">${category.name}</a></li>
 						</c:if>
 						</c:forEach>
                     </ul>
@@ -313,7 +313,7 @@
 	                    <ul>
 	                    	<c:forEach var="categorychild" items="${categories }">
 	    					<c:if test="${categorychild.pid eq category.id}">
-	                        <li><a href="#">${categorychild.name }</a></li>
+	                        <li><a href="category?id=${categorychild.id}">${categorychild.name }</a></li>
 	                        </c:if>
 	                        </c:forEach> 
 	                    </ul>

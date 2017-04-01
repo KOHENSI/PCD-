@@ -106,7 +106,7 @@
 </div><!-- /.contact-row -->
 <!-- ============================================================= SEARCH AREA ============================================================= -->
 <div class="search-area">
-    <form>
+    <form method="post" action="home">
         <div class="control-group">
 
             <ul class="categories-filter animate-dropdown">
@@ -115,24 +115,20 @@
                     <a class="dropdown-toggle"  data-toggle="dropdown" href="category.html">Categories <b class="caret"></b></a>
                     
                     <ul class="dropdown-menu" role="menu" >
-                       
-                        <li class="menu-header">Ordinateurs</li>
-                        <li class="menu-header">Tablettes PC</li>
-                        <li class="menu-header">Smartphones</li>
-                        <li class="menu-header">Ecrans PC</li>
-                        <li class="menu-header">IMPRESSION</li>
-                        <li class="menu-header">Image & Son</li>
-                        <li class="menu-header">Accessoires</li>
-                        <li class="menu-header">Logiciels</li>
+                       <c:forEach var="category" items="${categories }">
+                    	<c:if test="${category.pid  eq 0}">
+                        <li class="menu-header"><a  href="category?id=${category.id }">${category.name}</a></li>
+						</c:if>
+						</c:forEach>
 
                     </ul>
                     
                 </li>
             </ul>
 
-            <input class="search-field" placeholder="Search here..." />
+            <input class="search-field" placeholder="Saisir un mot clé" name="searchkeyword"/>
 
-            <a class="search-button" href="#" ></a>    
+            <a class="search-button" href="#" onclick="event.preventDefault(); this.parentNode.submit()" ></a>    
 
         </div>
     </form>
@@ -767,7 +763,7 @@
 	<div class="product">		
 		<div class="product-image">
 			<div class="image">
-				<a href="/product?id=${ product.id }"><img src=${ product.imglink }  style="height:180px;"></a>
+				<a href="product?id=${ product.id }"><img src=${ product.imglink }  style="height:180px;"></a>
 			</div><!-- /.image -->			                       		   
 		</div><!-- /.product-image -->
 			
@@ -2008,8 +2004,6 @@
 	
 </div><!-- /.logo-slider -->
 <!-- ============================================== BRANDS CAROUSEL : END ============================================== -->
-	</div><!-- /.container -->
-</div><!-- /#top-banner-and-menu -->
 
 
 

@@ -63,44 +63,53 @@ public class ProductDaoImpl implements ProductDao {
 	    public List<Product> listerParCategorie(String idp) {
 	        List<Product> products = new ArrayList<Product>();
 	        Connection connexion = null;
+	        Statement statementcat = null;
 	        Statement statement = null;
 	        ResultSet resultat = null;
+	        ResultSet resultatcat = null;
 
 	        try {
 	            connexion = (Connection) daoFactory.getConnection();
+	            statementcat = (Statement) connexion.createStatement();
 	            statement = (Statement) connexion.createStatement();
-	            String requete = String.format("SELECT * FROM allproducts WHERE categoryid=%s;", idp);
-	            resultat = statement.executeQuery(requete);
-	            while (resultat.next()) {
-	            	int id = resultat.getInt("id");
-	            	int catid = resultat.getInt("categoryid");;
-	            	String catergory = resultat.getString("category");
-	            	int brandid = resultat.getInt("brandid");
-	            	String name = resultat.getString("name");
-	            	String description = resultat.getString("description");
-	            	int price = resultat.getInt("price");
-	            	int vondorid = resultat.getInt("venderid");
-	            	String link = resultat.getString("link");
-	            	String imglink = resultat.getString("imagelink");
-	                
-	            	Product product = new Product();
-	                
-	            	product.setId(id);
-	                product.setCatid(catid);
-	                product.setCatergory(catergory);
-	                product.setBrandid(brandid);
-	                product.setName(name);
-	                product.setDescription(description);
-	                product.setPrice(price);
-	                product.setVondorid(vondorid);
-	                product.setLink(link);
-	                product.setImglink(imglink);
+	            String requetecat = String.format("SELECT * FROM categories WHERE id=%s or pid=%s;", idp,idp);
+	            resultatcat = statementcat.executeQuery(requetecat);
+	            while (resultatcat.next()) {
+	            	int categoryid = resultatcat.getInt("id");
+	            	String requete = String.format("SELECT * FROM allproducts WHERE categoryid=%d;", categoryid);
+		            resultat = statement.executeQuery(requete);
+		            while (resultat.next()) {
+		            	int id = resultat.getInt("id");
+		            	int catid = resultat.getInt("categoryid");
+		            	String catergory = resultat.getString("category");
+		            	int brandid = resultat.getInt("brandid");
+		            	String name = resultat.getString("name");
+		            	String description = resultat.getString("description");
+		            	int price = resultat.getInt("price");
+		            	int vondorid = resultat.getInt("venderid");
+		            	String link = resultat.getString("link");
+		            	String imglink = resultat.getString("imagelink");
+		                
+		            	Product product = new Product();
+		                
+		            	product.setId(id);
+		                product.setCatid(catid);
+		                product.setCatergory(catergory);
+		                product.setBrandid(brandid);
+		                product.setName(name);
+		                product.setDescription(description);
+		                product.setPrice(price);
+		                product.setVondorid(vondorid);
+		                product.setLink(link);
+		                product.setImglink(imglink);
 
-	                products.add(product);
+		                products.add(product);
+		            }
 	            }
 	        } catch (SQLException e) {
 	            e.printStackTrace();
 	        }
+	            
 	        return products;
 	    }
 	  public Product getProductById(String idp)
@@ -146,6 +155,51 @@ public class ProductDaoImpl implements ProductDao {
 	            e.printStackTrace();
 	        }
 	return product;
+	  }
+	  
+	  
+	  public List<Product> listerParMotCle(String keyword){
+		  List<Product> products = new ArrayList<Product>();
+	        Connection connexion = null;
+	        Statement statement = null;
+	        ResultSet resultat = null;
+
+	        try {
+	            connexion = (Connection) daoFactory.getConnection();
+	            statement = (Statement) connexion.createStatement();
+	            String requete = String.format("SELECT * FROM allproducts WHERE name LIKE '%%%s%%';", keyword);
+	            resultat = statement.executeQuery(requete);
+	            while (resultat.next()) {
+	            	int id = resultat.getInt("id");
+	            	int catid = resultat.getInt("categoryid");;
+	            	String catergory = resultat.getString("category");
+	            	int brandid = resultat.getInt("brandid");
+	            	String name = resultat.getString("name");
+	            	String description = resultat.getString("description");
+	            	int price = resultat.getInt("price");
+	            	int vondorid = resultat.getInt("venderid");
+	            	String link = resultat.getString("link");
+	            	String imglink = resultat.getString("imagelink");
+	                
+	            	Product product = new Product();
+	                
+	            	product.setId(id);
+	                product.setCatid(catid);
+	                product.setCatergory(catergory);
+	                product.setBrandid(brandid);
+	                product.setName(name);
+	                product.setDescription(description);
+	                product.setPrice(price);
+	                product.setVondorid(vondorid);
+	                product.setLink(link);
+	                product.setImglink(imglink);
+
+	                products.add(product);
+	            }
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	        return products;
 	  }
 }
 

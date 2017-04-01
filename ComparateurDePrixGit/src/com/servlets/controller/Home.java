@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.model.dao.CategoryDao;
 import com.model.dao.DAOFactory;
 import com.model.dao.ProductDao;
 
@@ -22,10 +23,12 @@ public class Home extends HttpServlet {
      * Default constructor. 
      */
 	private ProductDao productDao;
+	private CategoryDao categoryDao;
 
     public void init() throws ServletException {
         DAOFactory daoFactory = DAOFactory.getInstance();
         this.productDao = daoFactory.getProductDao();
+        this.categoryDao = daoFactory.getCategoryDao();
     }
 
 	/**
@@ -34,6 +37,7 @@ public class Home extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		request.setAttribute("products", productDao.lister());
+		request.setAttribute("categories",categoryDao.lister() );
 		this.getServletContext().getRequestDispatcher("/WEB-INF/home.jsp").forward(request, response);
 	}
 
@@ -42,7 +46,11 @@ public class Home extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		this.getServletContext().getRequestDispatcher("/WEB-INF/home.jsp").forward(request, response);
+		String keyword = request.getParameter("searchkeyword");
+		if (keyword != null){
+		String link=String.format("category?searchkeyword=%s", keyword);
+		response.sendRedirect(link);
+		}else this.getServletContext().getRequestDispatcher("/WEB-INF/home.jsp").forward(request, response);
 	}
 
 }

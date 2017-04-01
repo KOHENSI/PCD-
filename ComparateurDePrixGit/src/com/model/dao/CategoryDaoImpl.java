@@ -32,13 +32,15 @@ public class CategoryDaoImpl implements CategoryDao {
             	int id = resultat.getInt("id");
             	int pid = resultat.getInt("pid");
             	String name = resultat.getString("name");
+            	String icon = resultat.getString("icon");
                 
             	Category category = new Category();
                 
             	category.setId(id);
                 category.setPid(pid);
                 category.setName(name);
-
+                category.setIcon(icon);
+                
                 categories.add(category);
             }
         } catch (SQLException e) {
