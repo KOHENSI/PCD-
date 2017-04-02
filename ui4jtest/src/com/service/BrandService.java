@@ -7,17 +7,13 @@ import com.database.ConnexionBD;
 
 public class BrandService {
 	private static final String BRANDS_TABLE = "brands";
+	ConnexionBD conn = new ConnexionBD();
 
 	public void deleteAllBrands(){
-		ConnexionBD conn = new ConnexionBD();
-		
 		conn.Update("delete from "+ BRANDS_TABLE );
-		
-		conn.arret();
 	}
 	
 	public String deleteBrands(String source){
-		ConnexionBD conn = new ConnexionBD();
 		
 		source = source.toLowerCase().replaceAll("[^a-z]", " ").replaceAll(" +", " ").trim();
 		
@@ -39,21 +35,19 @@ public class BrandService {
 			e.printStackTrace();
 		}
 		
-		conn.arret();
+		
 		return source;
 		
 	}
 	public int getBrandID(String brandName){
 		
-		ConnexionBD conn = new ConnexionBD();
 		
 		brandName=brandName.toLowerCase().replaceAll("[^a-z]", "");
 		
-		if (brandName.length()<=2)
+		/*if (brandName=="pc")
 		{
-			conn.arret();
 			return 0;
-		}
+		}*/
 		
 		ResultSet res = conn.ReadRequest(
 				"select id from " + BRANDS_TABLE
@@ -64,19 +58,22 @@ public class BrandService {
 			{
 				int id =  res.getInt("id");
 				System.out.println("the brand  have the id of "+id);
-				conn.arret();
+				
 				return id;
 			}else
 			{
 				conn.Update("insert into " +  BRANDS_TABLE +" (name) values " + " ('"+ brandName+"')");
-				conn.arret();
+				
 				return getBrandID(brandName);
 			}
 		} catch (SQLException e) 
 		{
 		
 		}
-		conn.arret();
 		return -1;
 	}
+	public void stop(){
+		conn.arret();
+	}
+	
 }

@@ -9,10 +9,12 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 
+import info.debatty.java.stringsimilarity.Levenshtein;
+
 public class Product {
 
 	// attributes
-	private String name, brand, desc , category;
+	private String name, brand, desc , category , reference ;
 
 	private int categoryID;
 
@@ -64,7 +66,7 @@ public class Product {
 	}
 
 	public void setName(String name) {
-		this.name = name.toLowerCase().replaceAll("-|(/.*)", " ").trim();
+		this.name = cleanString(name);
 	}
 
 	public String getBrand() {
@@ -72,7 +74,15 @@ public class Product {
 	}
 
 	public void setBrand(String brand) {
-		this.brand = brand.trim().toLowerCase();
+		this.brand = cleanString(brand);
+	}
+	
+	public String getRef() {
+		return reference;
+	}
+
+	public void setRef(String reference) {
+		this.reference = cleanString(reference);
 	}
 
 	public String getDesc() {
@@ -80,7 +90,7 @@ public class Product {
 	}
 
 	public void setDesc(String desc) {
-		this.desc = desc.toLowerCase().replaceAll("[^\\p{L}.,0-9 ]", "");
+		this.desc = desc.replaceAll("[^\\p{L}.,0-9 .,;]", "");
 	}
 
 	public String getCategory() {
@@ -104,7 +114,7 @@ public class Product {
 	}
 
 	public void setCategory(String category) {
-		this.category = category.toLowerCase().replaceAll("[^\\p{L} ]", "").replaceAll(" +", " ").replaceAll(getBrand(), "").trim();
+		this.category = category.toLowerCase().replaceAll("[^ \\p{L}]", " ").replaceAll("[ ]+", " ").replaceAll(getBrand(), "").trim();
 	}
 
 	public void deleteSpec(String Spec) {
@@ -126,46 +136,12 @@ public class Product {
 		desc = "";
 		name = "";
 		brand = "";
+		reference="";
 	}
 
-	public boolean isSameProduct(Product p) {
-		String[] tokens1;
-		String[] tokens2;
+	
 
-		// if ( this.getCategory() != p.getCategory() ) return false;
-		// if ( this.getBrand() != p.getBrand() ) return false;
-		// if ( this.getName() != p.getName() ) return false;
-		// if ( this.getCategory() != p.getCategory() ) return false;
-		if (comparePrice(this, p))
-			return false;
-
-		tokens1 = name.replaceAll("[-\\s/]", " ").toUpperCase().split(" ");
-		tokens2 = p.getName().replaceAll("-", " ").toUpperCase().split(" ");
-
-		Set<String> tokensSet1 = new HashSet<String>(Arrays.asList(tokens1));
-		Set<String> tokensSet2 = new HashSet<String>(Arrays.asList(tokens2));
-
-		float total = Math.min(tokensSet1.size(), tokensSet2.size());
-
-		Set<String> intersection = Sets.intersection(tokensSet1, tokensSet2);
-
-		float similarity = intersection.size();
-
-		System.out.println(similarity / total + " " + similarity + " " + total);
-
-		if (similarity / total <= 0.5)
-			return false;
-
-		return true;
-	}
-
-	private boolean comparePrice(Product p1, Product p2) {
-		int max = Math.max(p1.getPrice(), p2.getPrice());
-		int min = Math.min(p1.getPrice(), p2.getPrice());
-
-		return ((max * 0.93f) < min);
-	}
-
+	
 	public String getLink() {
 		return this.link;
 	}
@@ -179,5 +155,10 @@ public class Product {
 	
 	public void setImgaeLink(String imgLink) {
 		this.imgLink=imgLink;
+	}
+
+	protected String cleanString(String source)
+	{
+		return source.toLowerCase().replaceAll(" +"," ").trim();
 	}
 }
