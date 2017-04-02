@@ -44,8 +44,8 @@ public CategoryExtractor(){
 	@Override
 	protected void getCategoryLinks() {
 		// TODO Auto-generated method stub
-		categoryService.deleteAllCategories();
-		categoryService.deleteAllCategoryKeys();
+		categoryService.resetCategories();
+		categoryService.resetCategoryKeys();
         
 		Page page = webkit
                 .navigate(venderUrl);

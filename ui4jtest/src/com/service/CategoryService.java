@@ -1,5 +1,10 @@
 package com.service;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -10,48 +15,44 @@ import info.debatty.java.stringsimilarity.NormalizedLevenshtein;
 
 public class CategoryService {
 	
+	protected static final int UNRELATED_CATEGORY_ID = 99;
+	
 	protected static final String CATEGORIES_TABLE = "categories";
-	protected static final String CATEGORIYKEYS_TABLE = "categorykeys";
+	protected static final String CATEGORYKEYS_TABLE = "categorykeys";
+	
+	ConnexionBD conn = new ConnexionBD ();
 	 
-	public String removeUselessKeys(String source){
-		ConnexionBD conn = new ConnexionBD ();
-		
-		source.toLowerCase().replaceAll("[^\\p{L}]", " ").replaceAll(" +", " ").trim();
+	public String removeUselessKeys(String source , int categoryid){
 		
 		//remove useless keys++
 		ResultSet res = conn.ReadRequest("select keyword from categorykeys where "
-				+ "categoryid = 0 ");
+				+ "categoryid =" + categoryid);
 		
 		try {
 			while(res.next()){
-				source.replaceAll(res.getString("keyword"),"");
+				source = source.replaceAll(res.getString("keyword"),"");
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		//remove useless keys--
-		conn.arret();
 		return source;
 	}
 	
 	public int lookForCategoryV2(String source){
 		
-		ConnexionBD conn = new ConnexionBD ();
 		NormalizedLevenshtein l = new NormalizedLevenshtein();
 		ResultSet res;
 		
-		removeUselessKeys(source);
-		
 		res = conn.ReadRequest("select * from categorykeys");
-		
 		
 		try {
 			while(res.next())
 			{
-				if (l.distance(source.toLowerCase().trim(), res.getString("keyword").toLowerCase().trim()) < 0.1 )
+				if (l.distance(source.toLowerCase().trim(), res.getString("keyword").toLowerCase().trim()) == 0 )
 					{
-						System.out.println(res.getString("keyword") + " " +  source +" " +l.distance(source, res.getString("keyword")));
+						//System.out.println(res.getString("keyword") + " " +  source +" " +l.distance(source, res.getString("keyword")));
 						return res.getInt("categoryid");
 					}
 			}
@@ -62,15 +63,11 @@ public class CategoryService {
 			e.printStackTrace();
 		}
 		
-		
-		conn.arret();
 		return 0;
 	}
 	
 	public int lookForCategory(String source){
 		
-		ConnexionBD conn = new ConnexionBD ();
-	
 		ResultSet res = conn.ReadRequest("select keyword from categorykeys where "
 				+ "categoryid = 0 ");
 		
@@ -95,13 +92,10 @@ public class CategoryService {
 			e.printStackTrace();
 		}
 		
-		conn.arret();
 		return 0;
 	}
 	
 	public void removeKeysFromName (Product p){
-		
-		ConnexionBD conn = new ConnexionBD ();
 		
 		ResultSet res = conn.ReadRequest("select keyword from categorykeys where "
 				+ "categoryid = 0 or categoryid = "+ p.getCategoryID());
@@ -116,49 +110,59 @@ public class CategoryService {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
-		conn.arret();
 	}
 	public void addCategoty(int pid ,String name ){
-		
-		ConnexionBD conn = new ConnexionBD ();
 		
 		conn.Update("insert into "+ CATEGORIES_TABLE + " (pid , name )"
 				+ "values"
 				+ "(" +pid +" , '"+name+"')");
-	  conn.arret();
 	}
 	
 	public void addCategoryKey(int catid , String name ){
-		
-		ConnexionBD conn = new ConnexionBD ();
-		
-		conn.Update("insert into "+ CATEGORIYKEYS_TABLE + " ( categoryid , keyword )"
+		conn.Update("insert into "+ CATEGORYKEYS_TABLE + " ( categoryid , keyword )"
 				+ "values"
 				+ "(" + catid +" , '"+name+"')");
-	  conn.arret();
 	}
 	
-	public void deleteAllCategories(){
-	ConnexionBD conn = new ConnexionBD ();
-		
+	public void resetCategories(){
 		conn.Update("delete from "+ CATEGORIES_TABLE );
-		
-		conn.arret();
+		conn.Update("alter table "+ CATEGORIES_TABLE +" auto_increment = 1");
+		try {
+			readCategories();
+		} catch (IOException e) {
+			System.err.println("Could not read categories from file");
+		}
+
 	}
 	
-	public void deleteAllCategoryKeys(){
-		ConnexionBD conn = new ConnexionBD ();
+	public void readCategories() throws IOException {
+		System.out.println("Reading from file");
+		// Open the file
+		File fileDir = new File("categories.sql");
+
+        BufferedReader br = new BufferedReader(
+           new InputStreamReader(new FileInputStream(fileDir), "UTF-8"));
+			String strLine;
+
+			//Read File Line By Line
+			while ((strLine = br.readLine()) != null)   {
+			  // Print the content on the console
+			  System.out.println (strLine);
+			  conn.Update(strLine);
+			}
+
+			//Close the input stream
+			br.close();
 			
-			conn.Update("delete from "+ CATEGORIYKEYS_TABLE );
-			
-			conn.arret();
+	}
+
+	public void resetCategoryKeys(){
+			conn.Update("delete from "+ CATEGORYKEYS_TABLE );
+			conn.Update("alter table "+ CATEGORYKEYS_TABLE +" auto_increment = 1");
 	}
 	
 	public int getCategoryID(String name)
 	{
-		ConnexionBD conn = new ConnexionBD ();
 		
 		ResultSet res = conn.ReadRequest("select id from "+ CATEGORIES_TABLE +" where name ='" + name+"'");
 		
@@ -172,8 +176,10 @@ public class CategoryService {
 			e.printStackTrace();
 		}
 		
-		conn.arret();
 		return 0;
+	}
+	public void stop(){
+		conn.arret();
 	}
 
 }

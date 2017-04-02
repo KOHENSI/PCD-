@@ -2,6 +2,7 @@ package com.crawler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.entity.Product;
 import com.ui4j.api.browser.Page;
@@ -122,35 +123,50 @@ public class ScoopCrawler extends Crawler{
 			    		//		product.query(BrandSelector).get().getInnerHTML()
 			    		//);
 			        	
+			        	
 			        	pName = product.query(nameSelector).get().getInnerHTML();
 			    		
 			    		p.setBrand(getBrandName(pName));
 			    		
 			    		p.setName(pName.toLowerCase().replaceFirst(p.getBrand(),"").trim());
 			    		
+			    		System.out.println(categoryLinks.get(i).replaceFirst(venderUrl, "").toLowerCase());
 			    		p.setCategory(
-			    				categoryService.removeUselessKeys(
 			    						categoryLinks.get(i).replaceFirst(venderUrl, "")
-			    				)
 			    		);
 			    		System.out.println(p.getCategory());
 			    		
 			    		p.setCategoryID( categoryService.lookForCategoryV2(p.getCategory()));
 			        	
+			    		Optional<Element> aux ;
+			    		
+			    		aux = product.query(priceSelector);
+			    		if (!aux.isPresent())continue;
+			    		
 			        	p.setPrice(
 			    				Integer.parseInt( 
-			    						product.query(priceSelector).get().getInnerHTML().replaceAll("<[^>]*>"," ").replaceAll("[^0-9]*","").trim()
+			    						aux.get().getInnerHTML().replaceAll("[^0-9]*","").trim()
 			    				)
 			    		);
+			        	
+			        	aux = product.query(descSelector);
+			    		if (!aux.isPresent())continue;
+			    		
 			    		p.setDesc(
-			    				product.query(descSelector).get().getInnerHTML().replaceAll("(<br>)|-"," ").replaceAll("<[^>]*>|[,;]"," ").replaceAll("\\s+"," ")
+			    				aux.get().getInnerHTML().replaceAll("(<br>)|-"," ").replaceAll("<[^>]*>|[,;]"," ").replaceAll("\\s+"," ")
 			    		);
 			    		
-			    		pLink = product.query(linkSelector).get().getAttribute("href").get();
+			    		aux = product.query(linkSelector);
+			    		if (!aux.isPresent())continue;
+			    		
+			    		pLink = aux.get().getAttribute("href").get();
 			    		if (!pLink.contains(venderUrl)) pLink=venderUrl+pLink;
 			    		p.setLink(pLink);
 			    		
-			    		pLink = product.query(imageLinkSelector).get().getAttribute("src").get();
+			    		aux = product.query(imageLinkSelector);
+			    		if (!aux.isPresent())continue;
+			    		
+			    		pLink = aux.get().getAttribute("src").get();
 			    		if (!pLink.contains(venderUrl)) pLink=venderUrl+pLink;
 			    		p.setImgaeLink(pLink);
 			    		

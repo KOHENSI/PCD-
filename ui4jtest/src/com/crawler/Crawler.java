@@ -4,6 +4,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 
 import com.database.ConnexionBD;
 import com.entity.Product;
@@ -27,8 +30,11 @@ public abstract class Crawler {
 	
 	//Lists
 	List<String> categoryLinks = new ArrayList<String>();
+	List<String> productLinks = new ArrayList<String>();
 	List<Element> categoryElements = new ArrayList<Element>();
+	List<Element> subCategoryElements = new ArrayList<Element>();
 	List<Element> products = new ArrayList<Element>();
+	List<Integer> categoriesToIgnore = new ArrayList<Integer>();
 	
 	//Eelments
 	Element product;
@@ -43,6 +49,9 @@ public abstract class Crawler {
 	Document subDocument;
 	
 	//Selectors
+	
+	protected String mainCategorySelector;
+	protected String subCategorySelector;
 	protected String categorySelector;
 	protected String categoryNameSelector;
 	protected String productBlockSelector;
@@ -50,9 +59,10 @@ public abstract class Crawler {
 	protected String priceSelector ;
 	protected String descSelector ;
 	protected String linkSelector;
+	protected String brandSelector;
+	protected String referenceSelector;
 	protected String imageLinkSelector;
 	protected String paginationSelector;
-	protected String brandSelector;
 	protected String loadingContent;
 	
 	protected CategoryService categoryService = new CategoryService();
@@ -81,22 +91,62 @@ public abstract class Crawler {
 	
 	public void crawl(){
 		getCategoryLinks();
+		getProductLinks();
 		removeOldProducts();
 		getProducts();
 	}; 
 	
-	protected abstract void getCategoryLinks();
+protected void getCategoryLinks() {
+		
+		Page page = webkit
+                .navigate(venderUrl);
+        Document document = page.getDocument();
+
+        categoryElements = document.queryAll(mainCategorySelector);
+      
+        Element element;
+        String link;
+        
+        for (int i =0 ; i < categoryElements.size() ; i++)
+        {       	
+        	if(categoriesToIgnore.contains(i)) continue;
+        	
+        	element = categoryElements.get(i);
+        	subCategoryElements = element.queryAll(subCategorySelector);
+        	Optional<String> os;
+        	for(int j =0 ; j < subCategoryElements.size() ; j++)
+        	{
+        		os = subCategoryElements.get(j).getAttribute("href");
+        		if (os.isPresent())
+        		{
+        			link=os.get();
+        			if (!link.contains(venderUrl)) link=venderUrl+link;
+        			categoryLinks.add(link);
+        			System.out.println(link);
+
+        		}else
+        			continue;
+        	}
+        	
+        }
+    }
 	
+	protected void getProductLinks()
+	{
+		
+	}
+
 	protected abstract void getProducts();
 	
 	protected boolean saveProduct(Product p){
 	
 		String request ="insert into " + PRODUCTS_TABLE 
-				+"(categoryid,category,brandid,name,description,price,venderid,link,imagelink)" + " values"
+				+"(categoryid,category,brandid,name,ref,description,price,venderid,link,imagelink)" + " values"
 				+"("+p.getCategoryID()+",'"
 					+p.getCategory()+"',"
 					+brandService.getBrandID(p.getBrand())+ ",'"
 					+p.getName()+"','"
+					+p.getRef()+"','"
 					+p.getDesc()+"',"
 					+p.getPrice()+","
 					+this.venderID+",'"
@@ -166,6 +216,8 @@ public abstract class Crawler {
 	}
 	
 	public void Stop(){
+		categoryService.stop();
+		brandService.stop();
 		//subPage.close();
 		conn.arret();
 		//page.close();
@@ -179,5 +231,5 @@ public abstract class Crawler {
 	        } catch (InterruptedException e) {
 	            e.printStackTrace();
 	        }
-	 };
+	 }
 }
