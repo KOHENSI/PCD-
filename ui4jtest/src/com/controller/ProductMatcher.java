@@ -203,7 +203,7 @@ public boolean isSameProduct(Product p1,Product p2) {
 
 			//System.out.println(similarity / total + " " + similarity + " " + total);
 
-			if (similarity / total < 0.9)
+			if (similarity / total < 0.7)
 				return false;
 			//System.out.println(ref1 + " is NOT the same as " + ref2);
 			System.out.println(ref1 + " SAME NAME AS " + ref2);
