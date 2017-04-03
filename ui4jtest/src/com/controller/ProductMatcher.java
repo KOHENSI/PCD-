@@ -85,11 +85,13 @@ public class ProductMatcher {
 	public void saveNewProduct(Product p)
 	{
 		String request ="insert into " + MATCHED_PRODUCTS_TABLE 
-				+"(categoryid,brandid,name,ref)" + " values"
+				+"(categoryid,brandid,name,ref,description,imagelink)" + " values"
 				+"("+p.getCategoryID()+","
 					+p.getBrandID()+","
 					+"'"+p.getName()+"',"
-					+"'"+p.getRef()+"')" ;
+					+"'"+p.getRef()+"',"
+					+"'"+p.getDesc()+"',"
+					+"'"+p.getImgaeLink()+"')" ;
 					
 		conn.Update(request);
 		
