@@ -28,8 +28,8 @@ public class CategoryManager {
 		
 		
 		ResultSet res;
-		
-		res = conn.ReadRequest("select id , category from allproducts where categoryid = 0");
+
+		res = conn.ReadRequest("select id , category from allproducts");
 		
 		String categoryName;
 		int categoryId;
@@ -87,6 +87,7 @@ public class CategoryManager {
 		//manager.resetCategories();
 		manager.affectCategoryToAll();
 		manager.stop();		
-	}
 	
+	}
+
 }
